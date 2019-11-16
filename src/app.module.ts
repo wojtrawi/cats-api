@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 
 import { CatsModule } from './cats/cats.module';
+import { AuthModule } from './auth/auth.module';
 
 dotenv.config();
 const { DB_USER, DB_PASSWORD, DB_NAME } = process.env;
@@ -13,6 +14,7 @@ const { DB_USER, DB_PASSWORD, DB_NAME } = process.env;
       `mongodb+srv://${DB_USER}:${DB_PASSWORD}@sandbox-iianb.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`,
     ),
     CatsModule,
+    AuthModule,
   ],
   providers: [],
 })
