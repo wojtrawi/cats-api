@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
+import { Permissions } from '../auth/permissions.decorator';
+import { PermissionsGuard } from '../auth/permissions.guard';
 import { Cat } from './cat.interface';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './create-cat.dto';
@@ -25,7 +27,8 @@ export class CatsController {
     return this.catsService.find(id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
+  @Permissions('delete:cats')
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<Cat> {
     return this.catsService.remove(id);
