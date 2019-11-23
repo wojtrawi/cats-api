@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
+import * as helmet from 'helmet';
 
 import { AppModule } from './app.module';
 
@@ -19,6 +20,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
+  app.use(helmet());
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(process.env.PORT);
