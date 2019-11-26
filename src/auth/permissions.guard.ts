@@ -14,11 +14,17 @@ export class PermissionsGuard implements CanActivate {
       context.getHandler(),
     );
 
-    const userPermissions = context.getArgs()[0].user.scope.split(' ');
-
     if (!routePermissions) {
       return true;
     }
+
+    const scopeClaim = context.getArgs()[0].user.scope;
+
+    if (!scopeClaim) {
+      return false;
+    }
+
+    const userPermissions = scopeClaim.split(' ');
 
     const hasPermission = () =>
       userPermissions.some(permission => routePermissions.includes(permission));
