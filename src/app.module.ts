@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 
 import { CatsModule } from './cats/cats.module';
 import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 dotenv.config();
 const { DB_USER, DB_PASSWORD, DB_NAME } = process.env;
@@ -15,6 +16,7 @@ const { DB_USER, DB_PASSWORD, DB_NAME } = process.env;
     ),
     CatsModule,
     AuthModule,
+    UserModule,
   ],
   providers: [],
 })
