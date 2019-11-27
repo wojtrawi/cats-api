@@ -67,18 +67,14 @@ describe('CatsService', () => {
         exec: jest.fn().mockResolvedValue(null),
       }));
 
-      let error;
+      await expect(service.find(mockCatDto._id)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
 
-      try {
-        const cat = await service.find(mockCatDto._id);
-      } catch (e) {
-        error = e;
-      }
-
-      expect(catModel.findById).toHaveBeenCalledTimes(1);
-      expect(catModel.findById).toHaveBeenCalledWith(mockCatDto._id);
-      expect(error instanceof NotFoundException).toBe(true);
-      expect(error.message.message).toContain(mockCatDto._id);
+      await expect(service.find(mockCatDto._id)).rejects.toHaveProperty(
+        'message.message',
+        `Cat with id: ${mockCatDto._id} does not exist.`,
+      );
     });
   });
 
@@ -100,18 +96,14 @@ describe('CatsService', () => {
         exec: jest.fn().mockResolvedValue(null),
       }));
 
-      let error;
+      await expect(service.remove(mockCatDto._id)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
 
-      try {
-        const cat = await service.remove(mockCatDto._id);
-      } catch (e) {
-        error = e;
-      }
-
-      expect(catModel.findByIdAndRemove).toHaveBeenCalledTimes(1);
-      expect(catModel.findByIdAndRemove).toHaveBeenCalledWith(mockCatDto._id);
-      expect(error instanceof NotFoundException).toBe(true);
-      expect(error.message.message).toContain(mockCatDto._id);
+      await expect(service.remove(mockCatDto._id)).rejects.toHaveProperty(
+        'message.message',
+        `Cat with id: ${mockCatDto._id} does not exist.`,
+      );
     });
   });
 });
