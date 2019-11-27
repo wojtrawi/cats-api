@@ -1,21 +1,32 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import * as dotenv from 'dotenv';
 
-import { CatsModule } from './cats/cats.module';
 import { AuthModule } from './auth/auth.module';
-
-dotenv.config();
-const { DB_USER, DB_PASSWORD, DB_NAME } = process.env;
+import { CatsModule } from './cats/cats.module';
+import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      `mongodb+srv://${DB_USER}:${DB_PASSWORD}@sandbox-iianb.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`,
-    ),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: getDBUri(configService),
+      }),
+      inject: [ConfigService],
+    }),
     CatsModule,
     AuthModule,
+    ConfigModule,
   ],
   providers: [],
 })
 export class AppModule {}
+
+function getDBUri(configService: ConfigService): string {
+  const dbUser = configService.get('DB_USER');
+  const dbPassword = configService.get('DB_PASSWORD');
+  const dbName = configService.get('DB_NAME');
+
+  return `mongodb+srv://${dbUser}:${dbPassword}@sandbox-iianb.mongodb.net/${dbName}?retryWrites=true&w=majority`;
+}
