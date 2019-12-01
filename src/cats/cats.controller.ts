@@ -13,6 +13,8 @@ import {
 
 import { Permissions } from '../auth/permissions.decorator';
 import { PermissionsGuard } from '../auth/permissions.guard';
+import { CatFiltersConfig } from './cat-filters.config';
+import { CatFilters } from './cat-filters.decorator';
 import { CatDto } from './cat.dto';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './create-cat.dto';
@@ -40,8 +42,11 @@ export class CatsController {
     description: 'The cats list has been successfully retrieved.',
     type: [CatDto],
   })
-  async findAll(): Promise<CatDto[]> {
-    return this.catsService.findAll();
+  async findAll(
+    @CatFilters
+    filtersConfig: CatFiltersConfig,
+  ): Promise<CatDto[]> {
+    return this.catsService.findAll(filtersConfig);
   }
 
   @Get(':id')

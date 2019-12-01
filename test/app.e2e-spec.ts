@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Model } from 'mongoose';
 import * as mongoose from 'mongoose';
 import * as request from 'supertest';
@@ -19,6 +20,7 @@ describe('Cats API (e2e)', () => {
   let invalidAccessToken: string;
   let app;
   let catsModel: Model<Cat>;
+  let mongod: MongoMemoryServer;
 
   beforeAll(async () => {
     accessToken = await login();
@@ -32,6 +34,14 @@ describe('Cats API (e2e)', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
+        MongooseModule.forRootAsync({
+          useFactory: async () => {
+            mongod = new MongoMemoryServer();
+            const uri = await mongod.getConnectionString();
+
+            return { uri };
+          },
+        }),
         AppModule,
         MongooseModule.forFeature([{ name: 'Cat', schema: CatSchema }]),
       ],
@@ -47,6 +57,7 @@ describe('Cats API (e2e)', () => {
 
   afterEach(async () => {
     await app.close();
+    await mongod.stop();
   });
 
   describe('POST', () => {

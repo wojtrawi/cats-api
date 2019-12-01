@@ -27,7 +27,12 @@ async function bootstrap() {
       max: 100,
     }),
   );
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
   await app.listen(app.get(ConfigService).get('PORT'));
 }
 bootstrap();
