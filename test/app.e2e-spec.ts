@@ -6,10 +6,10 @@ import { Model } from 'mongoose';
 import * as mongoose from 'mongoose';
 import * as request from 'supertest';
 
+import { CreateCatDto } from '../src/cats/dto';
+import { CatSchema } from '../src/cats/schema';
 import { AppModule } from './../src/app.module';
-import { Cat } from './../src/cats/cat.interface';
-import { CatSchema } from './../src/cats/cat.schema';
-import { CreateCatDto } from './../src/cats/create-cat.dto';
+import { CatEntity } from './../src/cats/entity';
 import { login, loginAsAdmin } from './auth.helpers';
 
 const mockCats: CreateCatDto[] = [{ name: 'Kitten#1' }, { name: 'Kitten#1' }];
@@ -19,7 +19,7 @@ describe('Cats API (e2e)', () => {
   let adminAccessToken: string;
   let invalidAccessToken: string;
   let app;
-  let catsModel: Model<Cat>;
+  let catsModel: Model<CatEntity>;
   let mongod: MongoMemoryServer;
 
   beforeAll(async () => {
@@ -101,7 +101,7 @@ describe('Cats API (e2e)', () => {
       const response = await request(app.getHttpServer()).get('/cats');
 
       expect(response.status).toBe(200);
-      expect(response.body.length).toBe(mockCats.length);
+      expect(response.body.docs.length).toBe(mockCats.length);
     });
   });
 

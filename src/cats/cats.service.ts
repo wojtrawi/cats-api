@@ -1,36 +1,30 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { PaginateModel, PaginateResult } from 'mongoose';
 
-import { CatFiltersConfig } from './cat-filters.config';
-import { Cat } from './cat.interface';
-import { CreateCatDto } from './create-cat.dto';
-
-// function getDBFilters(filters: object) {
-//   return Object.entries(filters).reduce(
-//     (acc, [key, value]) => ({
-//       ...acc,
-//       [key]: new RegExp(value),
-//     }),
-//     {},
-//   );
-// }
+import { CreateCatDto } from './dto/create-cat.dto';
+import { CatEntity } from './entity/cat.entity';
+import { CatsPageRequest } from './helpers/cats-page-request';
 
 @Injectable()
 export class CatsService {
-  constructor(@InjectModel('Cat') private readonly catModel: Model<Cat>) {}
+  constructor(
+    @InjectModel('Cat') private readonly catModel: PaginateModel<CatEntity>,
+  ) {}
 
-  async create(createCatDto: CreateCatDto): Promise<Cat> {
+  async create(createCatDto: CreateCatDto): Promise<CatEntity> {
     const createdCat = new this.catModel(createCatDto);
 
     return await createdCat.save();
   }
 
-  async findAll(filtersConfig: CatFiltersConfig): Promise<Cat[]> {
-    return await this.catModel.find(filtersConfig.dbFilters).exec();
+  async findAll(
+    catsPageRequest: CatsPageRequest,
+  ): Promise<PaginateResult<CatEntity>> {
+    return await catsPageRequest.getResponse(this.catModel);
   }
 
-  async find(id: string): Promise<Cat> {
+  async find(id: string): Promise<CatEntity> {
     const cat = await this.catModel.findById(id).exec();
 
     if (!cat) {
@@ -40,7 +34,7 @@ export class CatsService {
     return cat;
   }
 
-  async remove(id: string): Promise<Cat> {
+  async remove(id: string): Promise<CatEntity> {
     const cat = await this.catModel.findByIdAndRemove(id).exec();
 
     if (!cat) {

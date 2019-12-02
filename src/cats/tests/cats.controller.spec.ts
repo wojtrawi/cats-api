@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { CatDto } from './cat.dto';
-import { CatsController } from './cats.controller';
-import { CatsService } from './cats.service';
-import { CreateCatDto } from './create-cat.dto';
+import { CatsController } from '../cats.controller';
+import { CatsService } from '../cats.service';
+import { CatDto } from '../dto/cat.dto';
+import { CreateCatDto } from '../dto/create-cat.dto';
+import { CatsPageRequest } from '../helpers';
 
 const mockCatDto: CatDto = { _id: 'xyz', name: 'Kitten' };
 
@@ -54,7 +55,7 @@ describe('Cats Controller', () => {
     it('should return cats', async () => {
       catsService.findAll.mockResolvedValue([mockCatDto]);
 
-      const cats = await controller.findAll();
+      const cats = await controller.findAll(new CatsPageRequest({}));
 
       expect(catsService.findAll).toHaveBeenCalledTimes(1);
       expect(cats).toEqual([mockCatDto]);

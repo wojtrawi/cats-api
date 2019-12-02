@@ -2,13 +2,14 @@ import { NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { CatDto } from './cat.dto';
-import { CatsService } from './cats.service';
+import { CatsService } from '../cats.service';
+import { CatDto } from '../dto';
+import { CatsPageRequest } from '../helpers';
 
 const mockCatDto: CatDto = { _id: 'xyz', name: 'Kitten' };
 
 class MockCatModel {
-  find = jest.fn();
+  paginate = jest.fn();
   findById = jest.fn();
   findByIdAndRemove = jest.fn();
 }
@@ -38,13 +39,11 @@ describe('CatsService', () => {
 
   describe('findAll', () => {
     it('should return cats', async () => {
-      catModel.find.mockImplementation(() => ({
-        exec: jest.fn().mockResolvedValue([mockCatDto]),
-      }));
+      catModel.paginate.mockResolvedValue([mockCatDto]);
 
-      const cats = await service.findAll();
+      const cats = await service.findAll(new CatsPageRequest({}));
 
-      expect(catModel.find).toHaveBeenCalledTimes(1);
+      expect(catModel.paginate).toHaveBeenCalledTimes(1);
       expect(cats).toEqual([mockCatDto]);
     });
   });

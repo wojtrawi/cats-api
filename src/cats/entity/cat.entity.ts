@@ -1,5 +1,5 @@
 import { Document } from 'mongoose';
 
-export interface Cat extends Document {
+export interface CatEntity extends Document {
   readonly name: string;
 }
