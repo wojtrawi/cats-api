@@ -1,46 +1,56 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
 import { PaginateResult } from 'mongoose';
 
-import { Permissions, PermissionsGuard } from '../auth';
+import { User } from '../shared';
 import { CatsService } from './cats.service';
 import { CatsPageReq, DeleteApi, GetApi, GetOneApi, PostApi } from './decorators';
-import { CatDto, CreateCatDto } from './dto';
+import { CreateCatDto } from './dto';
+import { CatEntity } from './entity';
 import { CatsPageRequest } from './helpers';
+import { CatsPageTransformInterceptor, CatTransformInterceptor } from './interceptors';
 
 @Controller('cats')
+@UseGuards(AuthGuard('jwt'))
 @ApiUseTags('cats')
 @ApiBearerAuth()
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(CatTransformInterceptor)
   @Post()
   @PostApi()
-  async create(@Body() createCatDto: CreateCatDto): Promise<CatDto> {
-    return await this.catsService.create(createCatDto);
+  async create(
+    @Body() createCatDto: CreateCatDto,
+    @User('sub') userId: string,
+  ): Promise<CatEntity> {
+    return await this.catsService.create(createCatDto, userId);
   }
 
+  @UseInterceptors(CatsPageTransformInterceptor)
   @Get()
   @GetApi()
   async findAll(
     @CatsPageReq() catsPageRequest: CatsPageRequest,
-  ): Promise<PaginateResult<CatDto>> {
+  ): Promise<PaginateResult<CatEntity>> {
     return this.catsService.findAll(catsPageRequest);
   }
 
+  @UseInterceptors(CatTransformInterceptor)
   @Get(':id')
   @GetOneApi()
-  async find(@Param('id') id: string): Promise<CatDto> {
+  async find(@Param('id') id: string): Promise<CatEntity> {
     return this.catsService.find(id);
   }
 
-  @UseGuards(AuthGuard('jwt'), PermissionsGuard)
-  @Permissions('delete:cats')
+  @UseInterceptors(CatTransformInterceptor)
   @Delete(':id')
   @DeleteApi()
-  async remove(@Param('id') id: string): Promise<CatDto> {
-    return this.catsService.remove(id);
+  async remove(
+    @Param('id') id: string,
+    @User() user: { sub: string; scope?: string },
+  ): Promise<CatEntity> {
+    return this.catsService.remove(id, user);
   }
 }

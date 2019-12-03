@@ -7,4 +7,7 @@ export class CatDto {
 
   @ApiModelProperty()
   readonly name: string;
+
+  @ApiModelProperty()
+  readonly isUserCat: boolean;
 }
