@@ -14,7 +14,7 @@ export interface PaginationQuery {
 export class Pagination {
   private static defaultLimitOptions = [10, 25, 50, 75, 100];
   private static defaultPage = 1;
-  private static defaultLimit = Pagination.defaultLimitOptions[0];
+  private static defaultLimit = Pagination.defaultLimitOptions[4];
 
   private page: number;
   private limit: number;
